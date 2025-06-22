@@ -1,0 +1,75 @@
+import pandas as pd
+
+import numpy as np
+
+from sklearn.tree import DecisionTreeClassifier, export_text
+
+from sklearn.model_selection import train_test_split
+
+from sklearn.metrics import accuracy_score
+
+# Sample dataset: Job Offer Acceptance Prediction
+
+data = {
+
+"Salary (LPA)": [6, 10, 8, 15, 5, 7, 12, 9, 20, 6],
+
+"Company Reputation (1-10)": [7, 9, 8, 10, 5, 6, 9, 7, 10, 6],
+
+"Work-Life Balance (1-10)": [8, 6, 7, 5, 9, 8, 6, 7, 4, 9],
+
+"Career Growth (1-10)": [7, 8, 9, 10, 6, 7, 8, 7, 10, 5],
+
+"Location Preference (1-10)": [9, 6, 8, 5, 7, 9, 6, 8, 5, 7],
+
+"Benefits & Perks (1-10)": [8, 9, 7, 10, 6, 7, 9, 8, 10, 6],
+
+"Accept Offer": [1, 1, 1, 1, 0, 0, 1, 1, 1, 0] # 1: Accept, 8: Reject
+
+}
+
+# Convert to DataFrame
+
+df=pd.DataFrame(data)
+
+#Define features and target
+
+X=df.drop("Accept Offer", axis=1)
+
+y=df["Accept Offer"]
+
+#Split the dataset
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+#Train the Decision Tree model
+
+dt_classifier=DecisionTreeClassifier(criterion='entropy', max_depth=4, 
+
+random_state=42)
+
+dt_classifier.fit(X_train, y_train)
+
+#Predict on the test set
+
+y_pred=dt_classifier.predict(X_test)
+
+#Evaluate model accuracy I
+
+accuracy=accuracy_score(y_test, y_pred)
+
+print(f"Model Accuracy: {accuracy:.2f}")
+
+#Display Decision Tree rules
+
+print("Decision Tree Structure:")
+
+print(export_text(dt_classifier, feature_names=X.columns.tolist()))
+
+#Predict job offer acceptance for a new candidate
+
+new_candidate= pd.DataFrame (np.array([[10, 6.6, 7, 9, 6, 8]]), columns=X.columns)
+
+predicted_acceptance= dt_classifier.predict(new_candidate)
+
+print(f"Predicted Decision: {'Accept' if predicted_acceptance[0] == 1 else 'Reject'}")
