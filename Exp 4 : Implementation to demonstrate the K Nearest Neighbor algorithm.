@@ -1,0 +1,54 @@
+import numpy as np
+
+from sklearn.neighbors import KNeighborsClassifier
+
+from sklearn.preprocessing import LabelEncoder
+
+# Sample data (replace with your actual data)
+
+X = np.array([[40, 20], [50, 50], [60, 90], [10, 25], [70, 70], [60, 10],[25,80]]) # Brightness, 
+
+Saturation
+
+y = np.array(['Red', 'Blue','Blue', 'Red', 'Blue', 'Red', 'Blue'])
+
+# Encode labels (Red=0, Blue=1)
+
+label_encoder = LabelEncoder()
+
+y_encoded = label_encoder.fit_transform(y)
+
+# Initialize and train the KNN classifier
+
+knn = KNeighborsClassifier(n_neighbors=3) # Example with 3 neighbors
+
+knn.fit(X, y_encoded)
+
+# Example prediction
+
+unknown = np.array([[20, 35]])
+
+prediction_encoded = knn.predict(unknown)
+
+# Decode the prediction
+
+prediction = label_encoder.inverse_transform(prediction_encoded)
+
+print(f"Predicted class for Brightness={unknown[0][0]}, Saturation={unknown[0][1]}: 
+
+{prediction[0]}")
+
+print("Training Data Predictions")
+
+print("------------------------")
+
+y_pred_train= knn.predict(X)
+for i in range(len(X)):
+
+ predicted= label_encoder.inverse_transform([y_pred_train[i]])[0]
+
+ actual = y[i]
+
+ result="Correct" if predicted == actual else "Wrong"
+
+ print(f"Sample {i+1}: Predicted ={predicted},Actual= {actual} --> {result} ")
