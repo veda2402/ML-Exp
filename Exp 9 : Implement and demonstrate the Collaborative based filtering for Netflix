@@ -1,0 +1,92 @@
+import pandas as pd
+
+from sklearn.metrics.pairwise import cosine_similarity
+
+import numpy as np
+
+# Step 1: Create the user-item ratings matrix
+
+ratings_dict = {
+
+'Titanic': [5, 4, 1, 0, 0],
+
+'Inception': [3, 0, 1, 0, 0],
+
+'Avatar': [0, 0, 0, 5, 4],
+
+'Avengers': [0, 3, 5, 4, 5],
+
+'Interstellar': [2, 3, 4, 5, 5]
+
+}
+
+users = ['User1', 'User2', 'User3', 'User4', 'User5']
+
+ratings_df = pd.DataFrame(ratings_dict, index=users)
+
+print(" User-Movie Ratings Matrix:")
+
+print(ratings_df)
+
+# Step 2: Compute cosine similarity between users
+
+similarity_matrix = cosine_similarity(ratings_df)
+
+similarity_df = pd.DataFrame(similarity_matrix, index=users, columns=users)
+
+print("\n User Similarity Matrix (Cosine):")
+
+print(similarity_df.round(2))
+
+# Step 3: Recommend movies for User1
+
+target_user = 'User1'
+
+similar_users = similarity_df[target_user].drop(target_user)
+
+similar_users = similar_users.sort_values(ascending=False)
+
+print(f"\n Top similar users to {target_user}:")
+
+print(similar_users)
+
+# Step 4: Weighted rating prediction (simplified)
+
+user_idx = ratings_df.index.get_loc(target_user)
+ratings = ratings_df.values
+
+predicted_ratings = np.zeros(ratings.shape[1])
+
+for i in range(ratings.shape[1]):
+
+if ratings[user_idx, i] == 0: # only predict for movies not rated
+
+sim_sum = 0
+
+weighted_sum = 0
+
+for j in range(ratings.shape[0]):
+
+if j != user_idx and ratings[j, i] != 0:
+
+sim = similarity_matrix[user_idx, j]
+
+sim_sum += sim
+
+weighted_sum += sim * ratings[j, i]
+
+if sim_sum != 0:
+
+predicted_ratings[i] = weighted_sum / sim_sum
+
+# Step 5: Recommend top N movies
+
+movie_names = ratings_df.columns
+
+recommendations = pd.Series(predicted_ratings, index=movie_names)
+
+recommendations = recommendations.sort_values(ascending=False)
+
+print(f"\n Recommended movies for {target_user}:")
+
+print(recommendations[recommendations > 0].head(3)) # Top 3
