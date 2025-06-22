@@ -1,0 +1,139 @@
+import numpy as np
+
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+from sklearn.cluster import KMeans
+
+from sklearn.metrics import
+
+pairwise_distances_argmin
+
+# Step 1: Define input data
+
+points = {
+
+'A1': (2, 10),
+
+'A2': (2, 6),
+
+'A3': (11, 11),
+
+'A4': (6, 9),
+
+'A5': (6, 4),
+
+'A6': (1, 2),
+
+'A7': (5, 10),
+
+'A8': (4, 9),
+
+'A9': (10, 12),
+
+'A10': (7, 5),
+
+'A11': (9, 11),
+
+'A12': (4, 6),
+
+'A13': (3, 10),
+
+'A14': (3, 8),
+
+'A15': (6, 11)
+
+}
+
+# Convert to DataFrame
+
+labels = list(points.keys())
+
+X = np.array(list(points.values()))
+
+df = pd.DataFrame(X, columns=['X', 'Y'],
+
+index=labels)
+# Step 2: Define initial centroids manually 
+
+(A2, A7, A15)
+
+initial_centroids = np.array([
+
+points['A2'], # Cluster 1
+
+points['A7'], # Cluster 2
+
+points['A15'] # Cluster 3
+
+])
+
+# Step 3: Use KMeans with custom 
+
+initialization
+
+kmeans = KMeans(n_clusters=3,
+
+init=initial_centroids, n_init=1,
+
+random_state=0)
+
+kmeans.fit(X)
+
+# Step 4: Output cluster assignments
+
+df['Cluster'] = kmeans.labels_ + 1 # Cluster 
+
+numbers (1-indexed)
+
+print("Cluster Assignments:")
+
+print(df)
+
+# Step 5: Visualize the clustering
+
+plt.figure(figsize=(8, 6))
+
+colors = ['red', 'green', 'blue']
+
+for i in range(3):
+
+plt.scatter(X[kmeans.labels_ == i, 0],
+
+X[kmeans.labels_ == i, 1],
+
+s=100, c=colors[i], label=f'Cluster 
+
+{i+1}')
+
+# Plot initial centroids and final centroids
+
+plt.scatter(initial_centroids[:, 0],
+
+initial_centroids[:, 1],
+
+s=150, c='black', marker='x',
+
+label='Initial Centroids')
+
+plt.scatter(kmeans.cluster_centers_[:, 0],
+kmeans.cluster_centers_[:, 1],
+
+s=200, c='yellow', edgecolors='black', marker='*', label='Final Centroids')
+
+for i, txt in enumerate(labels):
+
+plt.annotate(txt, (X[i, 0] + 0.2, X[i, 1] + 0.2))
+
+plt.title('K-Means Clustering (K=3) with Custom Initial Centroids')
+
+plt.xlabel('X')
+
+plt.ylabel('Y')
+
+plt.legend()
+
+plt.grid(True)
+
+plt.show()
