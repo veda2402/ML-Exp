@@ -1,0 +1,78 @@
+# Importing necessary libraries
+
+import numpy as np
+
+import pandas as pd
+
+import matplotlib.pyplot as plt
+
+import seaborn as sns
+
+# Load dataset
+
+df = pd.read_csv('/content/drive/MyDrive/User_Data.csv') # Make sure your CSV is uploaded in 
+
+your Colab/working directory
+
+# Check for null values
+
+print("Missing values:\n", df.isnull().sum())
+
+# Feature selection (e.g., Age and EstimatedSalary) and Target variable (e.g., Purchased)
+
+X = df.iloc[:, [2, 3]].values # Age and Estimated Salary
+
+Y = df.iloc[:, 4].values # Purchased
+
+# Splitting dataset into Training and Test set
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.25, random_state=0)
+
+# Feature Scaling
+
+from sklearn.preprocessing import StandardScaler
+
+sc = StandardScaler()
+
+X_train = sc.fit_transform(X_train)
+
+X_test = sc.transform(X_test)
+
+# Fitting SVM to the Training set
+
+from sklearn.svm import SVC
+
+classifier = SVC(kernel='linear', random_state=0) # You can also use kernel='rbf' or 'poly'
+
+classifier.fit(X_train, Y_train)
+
+# Predicting the Test set results
+
+Y_pred = classifier.predict(X_test)
+
+# Confusion Matrix and Accuracy
+
+from sklearn.metrics import confusion_matrix, accuracy_score
+cm = confusion_matrix(Y_test, Y_pred)
+
+accuracy = accuracy_score(Y_test, Y_pred)
+
+# Output results
+
+print("Confusion Matrix:\n", cm)
+
+print(f"Accuracy: {accuracy * 100:.2f}%")
+
+# Heatmap
+
+sns.heatmap(pd.DataFrame(cm), annot=True, cmap='Blues', fmt='g')
+
+plt.title('Confusion Matrix Heatmap')
+
+plt.xlabel('Predicted')
+
+plt.ylabel('Actual')
+
+plt.show()
